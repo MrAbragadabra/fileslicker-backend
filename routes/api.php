@@ -17,5 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/admin/complaints', [UserController::class, 'listComplaints']);
         Route::get('/admin/files', [UserController::class, 'listFiles']);
         Route::get('/admin/uploads', [UserController::class, 'listUploads']);
+        Route::put('/admin/users/{id}/block', [UserController::class, 'blockUser']);
+        Route::put('/admin/users/{id}/unblock', [UserController::class, 'unblockUser']);
+        Route::put('/admin/complaints/{id}/close', [UserController::class, 'closeComplaint']);
     });
 });

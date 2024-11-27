@@ -35,4 +35,43 @@ class UserController extends Controller
         $uploads = Upload::all();
         return response()->json($uploads, 200);
     }
+
+    public function blockUser(Request $request, $id) {
+        $user = User::findOrFail($id);
+
+        if ($user->is_blocked == true) {
+            return response()->json(['message' => 'Пользователь уже заблокирован!'], 409);
+        }
+
+        $user->is_blocked = true;
+        $user->save();
+
+        return response()->json(['message' => 'Пользователь успешно заблокирован!'], 200);
+    }
+
+    public function unblockUser(Request $request, $id) {
+        $user = User::findOrFail($id);
+
+        if ($user->is_blocked == false) {
+            return response()->json(['message' => 'Пользователь уже разблокирован!'], 409);
+        }
+
+        $user->is_blocked = false;
+        $user->save();
+
+        return response()->json(['message' => 'Пользователь успешно разблокирован!'], 200);
+    }
+
+    public function closeComplaint(Request $request, $id) {
+        $compaint = Complaint::findOrFail($id);
+
+        if ($compaint->is_close == true) {
+            return response()->json(['message' => 'Данная жалоба уже закрыта!'], 409);
+        }
+
+        $compaint->is_close == true;
+        $compaint->save();
+
+        return response()->json(['message' => 'Жалоба закрыта!'], 200);
+    }
 }
