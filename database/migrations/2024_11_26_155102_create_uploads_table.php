@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('uploads', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->dateTime('expiration_time');
+            $table->dateTime('expiration_date');
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

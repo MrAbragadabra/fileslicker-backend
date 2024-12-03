@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('upload_id');
             $table->text('file_path');
             $table->text('file_size');
+            $table->text('file_name');
             $table->timestamps();
 
             $table->foreign('upload_id')->references('id')->on('uploads');

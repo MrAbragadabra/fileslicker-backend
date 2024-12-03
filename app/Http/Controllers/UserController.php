@@ -15,6 +15,20 @@ class UserController extends Controller
         return response()->json($request->user(), 200);
     }
 
+    public function editProfile(Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:20',
+        ]);
+
+        $user = User::findOrFail($request->id);
+
+        $user->name = $request->name;
+
+        $user->save();
+
+        return response()->json(['message' => 'Пользователь успешно изменён!'], 200);
+    }
+
     public function listUsers()
     {
         $users = User::all();
