@@ -8,12 +8,14 @@ use App\Http\Controllers\UploadController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/upload-guest', [UploadController::class, 'uploadGuest']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/profile/edit', [UserController::class, 'editProfile']);
-    Route::post('/upload', [UploadController::class, 'upload']);
+    Route::post('/upload-user', [UploadController::class, 'uploadUser']);
+
 
     Route::middleware('can:is-admin')->group(function () {
         Route::get('/admin/users', [UserController::class, 'listUsers']);

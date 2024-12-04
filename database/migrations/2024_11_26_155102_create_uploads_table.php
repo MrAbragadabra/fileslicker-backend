@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('uploads', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->dateTime('expiration_date');
             $table->boolean('is_deleted')->default(false);
             $table->timestamps();
