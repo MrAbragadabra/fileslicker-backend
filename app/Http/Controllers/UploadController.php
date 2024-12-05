@@ -144,4 +144,51 @@ class UploadController extends Controller
             return response()->json(['message' => 'Хоба оба и сломалось!', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function deleteUpload($id, Request $request)
+    {
+        // Находим загрузку по ID
+        $upload = Upload::find($id);
+
+        // Проверяем, существует ли загрузка
+        if (!$upload) {
+            return response()->json(['message' => 'Загрузка не найдена!'], 404);
+        }
+
+        // Проверяем, что пользователь является владельцем загрузки
+        if ($upload->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'У вас нет прав на удаление этой загрузки.'], 403);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Получаем все файлы, связанные с этой загрузкой
+            $files = File::where('upload_id', $id)->get();
+
+            // Удаляем файлы с диска
+            foreach ($files as $file) {
+                // Строим путь к файлу, как это сделано в загрузке
+                $filePath = 'uploads/' . $upload->id . '/' . $file->file_path;
+
+                // Полный путь к файлу в директории storage
+                $fullPath = storage_path('app/' . $filePath);
+
+                // Проверяем, существует ли файл и удаляем его
+                if (file_exists($fullPath)) {
+                    unlink($fullPath); // Удаляем файл с диска
+                }
+            }
+
+            // Удаляем запись о загрузке и файлы из базы данных (каскадное удаление)
+            $upload->delete();
+
+            DB::commit();
+
+            return response()->json(['message' => 'Загрузка и файлы успешно удалены!'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Ошибка удаления!', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

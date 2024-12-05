@@ -15,7 +15,8 @@ class UserController extends Controller
         return response()->json($request->user(), 200);
     }
 
-    public function editProfile(Request $request) {
+    public function editProfile(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:20',
         ]);
@@ -35,22 +36,37 @@ class UserController extends Controller
         return response()->json($users, 200);
     }
 
-    public function listComplaints() {
+    public function listComplaints()
+    {
         $complaints = Complaint::all();
         return response()->json($complaints, 200);
     }
 
-    public function listFiles() {
+    public function listFiles()
+    {
         $files = File::all();
         return response()->json($files, 200);
     }
 
-    public function listUploads() {
+    public function listUploads()
+    {
         $uploads = Upload::all();
         return response()->json($uploads, 200);
     }
 
-    public function blockUser(Request $request, $id) {
+    public function getUploads($user)
+    {
+        $uploads = Upload::where('user_id', $user)->get();
+        return response()->json($uploads, 200);
+    }
+
+    public function getFiles($upload) {
+        $files = File::where('upload_id', $upload)->get();
+        return response()->json($files, 200);
+    }
+
+    public function blockUser(Request $request, $id)
+    {
         $user = User::findOrFail($id);
 
         if ($user->is_blocked == true) {
@@ -63,7 +79,8 @@ class UserController extends Controller
         return response()->json(['message' => 'Пользователь успешно заблокирован!'], 200);
     }
 
-    public function unblockUser(Request $request, $id) {
+    public function unblockUser(Request $request, $id)
+    {
         $user = User::findOrFail($id);
 
         if ($user->is_blocked == false) {
@@ -76,7 +93,8 @@ class UserController extends Controller
         return response()->json(['message' => 'Пользователь успешно разблокирован!'], 200);
     }
 
-    public function closeComplaint(Request $request, $id) {
+    public function closeComplaint(Request $request, $id)
+    {
         $compaint = Complaint::findOrFail($id);
 
         if ($compaint->is_close == true) {

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('file_name');
             $table->timestamps();
 
-            $table->foreign('upload_id')->references('id')->on('uploads');
+            $table->foreign('upload_id')->references('id')->on('uploads')->cascadeOnDelete();
         });
     }
 
