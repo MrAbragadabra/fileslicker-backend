@@ -8,11 +8,6 @@ class Upload extends Model
 {
     protected $fillable = [
         'user_id',
-        'expiration_date',
-        'is_deleted'
-    ];
-
-    protected $casts = [
-        'is_deleted' => 'boolean'
+        'expiration_date'
     ];
 }

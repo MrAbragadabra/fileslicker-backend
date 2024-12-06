@@ -10,6 +10,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-guest', [UploadController::class, 'uploadGuest']);
 Route::get('/files/{upload}', [UserController::class, 'getFiles']);
+Route::post('/complaint/add', [UserController::class, 'complaintAdd']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
@@ -18,15 +19,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/edit', [UserController::class, 'editProfile']);
     Route::post('/upload-user', [UploadController::class, 'uploadUser']);
     Route::post('/upload/delete/{id}', [UploadController::class, 'deleteUpload']);
+    Route::post('/profile/delete', [UserController::class, 'deleteProfile']);
 
 
     Route::middleware('can:is-admin')->group(function () {
+        Route::post('/admin/upload/delete/{id}', [UploadController::class, 'deleteUploadAdmin']);
         Route::get('/admin/users', [UserController::class, 'listUsers']);
         Route::get('/admin/complaints', [UserController::class, 'listComplaints']);
         Route::get('/admin/files', [UserController::class, 'listFiles']);
         Route::get('/admin/uploads', [UserController::class, 'listUploads']);
-        Route::put('/admin/users/{id}/block', [UserController::class, 'blockUser']);
-        Route::put('/admin/users/{id}/unblock', [UserController::class, 'unblockUser']);
-        Route::put('/admin/complaints/{id}/close', [UserController::class, 'closeComplaint']);
+        Route::post('/admin/users/block/{id}', [UserController::class, 'blockUser']);
+        Route::post('/admin/users/unblock/{id}', [UserController::class, 'unblockUser']);
+        Route::post('/admin/users/grant/{id}', [UserController::class, 'grantAdmin']);
+        Route::post('/admin/users/revoke/{id}', [UserController::class, 'revokeAdmin']);
+        Route::post('/admin/complaint/close/{id}', [UserController::class, 'closeComplaint']);
     });
 });

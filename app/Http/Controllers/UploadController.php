@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
 use App\Models\Upload;
 use App\Models\File;
 
@@ -147,15 +149,12 @@ class UploadController extends Controller
 
     public function deleteUpload($id, Request $request)
     {
-        // Находим загрузку по ID
         $upload = Upload::find($id);
 
-        // Проверяем, существует ли загрузка
         if (!$upload) {
             return response()->json(['message' => 'Загрузка не найдена!'], 404);
         }
 
-        // Проверяем, что пользователь является владельцем загрузки
         if ($upload->user_id !== $request->user()->id) {
             return response()->json(['message' => 'У вас нет прав на удаление этой загрузки.'], 403);
         }
@@ -163,24 +162,42 @@ class UploadController extends Controller
         DB::beginTransaction();
 
         try {
-            // Получаем все файлы, связанные с этой загрузкой
-            $files = File::where('upload_id', $id)->get();
+            // Путь к папке загрузки
+            $folderPath = "uploads/{$upload->id}";
 
-            // Удаляем файлы с диска
-            foreach ($files as $file) {
-                // Строим путь к файлу, как это сделано в загрузке
-                $filePath = 'uploads/' . $upload->id . '/' . $file->file_path;
+            // Удаляем папку загрузки и все файлы в ней
+            Storage::deleteDirectory($folderPath);
 
-                // Полный путь к файлу в директории storage
-                $fullPath = storage_path('app/' . $filePath);
+            // Удаляем запись о загрузке из базы данных
+            $upload->delete();
 
-                // Проверяем, существует ли файл и удаляем его
-                if (file_exists($fullPath)) {
-                    unlink($fullPath); // Удаляем файл с диска
-                }
-            }
+            DB::commit();
 
-            // Удаляем запись о загрузке и файлы из базы данных (каскадное удаление)
+            return response()->json(['message' => 'Загрузка и файлы успешно удалены!'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Ошибка удаления!', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteUploadAdmin($id, Request $request)
+    {
+        $upload = Upload::find($id);
+
+        if (!$upload) {
+            return response()->json(['message' => 'Загрузка не найдена!'], 404);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Путь к папке загрузки
+            $folderPath = "uploads/{$upload->id}";
+
+            // Удаляем папку загрузки и все файлы в ней
+            Storage::deleteDirectory($folderPath);
+
+            // Удаляем запись о загрузке из базы данных
             $upload->delete();
 
             DB::commit();
